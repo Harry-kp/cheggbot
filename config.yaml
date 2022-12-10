@@ -1,0 +1,24 @@
+# Questions which contains any of these keywords will be treated as good question
+# Rest of the question will be skipped
+keywords: ['python', 'dsa', 'coding', 'c++','java']
+
+# Cookie is important for this script to run, remember cookie can be expired within 7-10 days, so
+# you need to refresh this value periodically
+cookie: None
+
+# wait_time(in secs), after every request to chegg server, a random wait time is choosed b/w
+# the below given time i.e 10-20 says 15 secs.
+# For this amount of time, the script will be paused
+# This is done to avoid bot detection mechanism of chegg.
+wait_time: [10,20]  #in secs
+
+# When the question queue is empty , the script will be stopped for a random time
+# chosen from below given amount of time
+# After this, the script will send request again for new question
+
+wait_after_queue_is_empty: [5,10]  #in minutes say(8 minutes)
+
+telegram:
+    token: None
+    chat_id: None
+
