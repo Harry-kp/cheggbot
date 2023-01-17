@@ -9,9 +9,8 @@
   </p>
 </p>
 
-## Highlight
-https://user-images.githubusercontent.com/55315065/205429850-a86df710-2a6d-4058-a813-cc38f06e10b9.mov
-
+## Youtube Video
+[![IMAGE ALT TEXT HERE](https://user-images.githubusercontent.com/55315065/212940447-dd4f7686-e384-4d1a-8906-2df67303ec4d.png)](https://www.youtube.com/watch?v=FtE64YC9XqA)
 
 ## Features
 - [x] Keyword based skipping of questions
