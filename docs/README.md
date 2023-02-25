@@ -9,8 +9,13 @@
   </p>
 </p>
 
-## Youtube Video
-[![IMAGE ALT TEXT HERE](https://user-images.githubusercontent.com/55315065/212940447-dd4f7686-e384-4d1a-8906-2df67303ec4d.png)](https://www.youtube.com/watch?v=FtE64YC9XqA)
+## Subscribe to our channel
+
+If you find this script useful, please consider subscribing to our channel for more updates. I need your support to grow my channel.
+
+[Click here to subscribe](https://www.youtube.com/@thepythonhacker7986)
+
+[![IMAGE ALT TEXT HERE](https://user-images.githubusercontent.com/55315065/221374382-106e9c23-6029-47cb-a365-eb22003b5f69.png)](https://www.youtube.com/watch?v=FtE64YC9XqA)
 
 ## Features
 - [x] Keyword based skipping of questions
