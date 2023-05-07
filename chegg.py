@@ -10,11 +10,12 @@ class Chegg:
     """
     A class that automates the process of answering ques on chegg and skip the question which are not good to answer.
     """
-    URL = "https://www.chegg.com/expert-bff/graphql"
+    URL = "https://gateway.chegg.com/nestor-graph/graphql"
     HEADERS = {
-        'authority': 'www.chegg.com',
+        'authority': 'gateway.chegg.com',
         'accept': '*/*',
-        'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+        'accept-language': 'en-GB,en;q=0.9',
+        'apollographql-client-name': 'chegg-web-producers',
         'content-type': 'application/json',
         'cookie': None,
         'origin': 'https://expert.chegg.com',
@@ -23,34 +24,24 @@ class Chegg:
         'sec-fetch-mode': 'cors',
         'sec-fetch-site': 'same-site',
         'sec-gpc': '1',
-        'tnc-version': 'v2',
-        'user-agent': 'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1'
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
     }
 
     FETCH_PAYLOAD = json.dumps({
-        "operationName": None,
+        "operationName": "NextQuestionAnsweringAssignment",
         "variables": {},
-        "query": "{\n  getQuestion {\n    id\n    uuid\n    expertId\n    subjectName\n    groupId\n    bonusAnswering\n    body\n    questionAssignTime\n    bonusCount\n    answerStartTime\n    isAnswerStarted\n    routingType\n    probability\n    granularGroups {\n      id\n      name\n      __typename\n    }\n    isStructuredAnsweredEnable\n    questionGeoDetailTags {\n      id\n      experimentId\n      countryName\n      countryCode\n      languages\n      __typename\n    }\n    hasImage\n    __typename\n  }\n  getExpertStats {\n    dashboardData {\n      day {\n        answered\n        skipped\n        __typename\n      }\n      month {\n        answered\n        skipped\n        __typename\n      }\n      week {\n        answered\n        skipped\n        __typename\n      }\n      __typename\n    }\n    cfScores {\n      currentDayScore\n      currentWeekScore\n      currentMonthScore\n      __typename\n    }\n    __typename\n  }\n  getSubjectList {\n    id\n    name\n    __typename\n  }\n  getCurrentTime\n}\n"
+        "query": "query NextQuestionAnsweringAssignment {\n  nextQuestionAnsweringAssignment {\n    question {\n      body\n      id\n      uuid\n      subject {\n        id\n        name\n        subjectGroup {\n          id\n          name\n          __typename\n        }\n        __typename\n      }\n      langTranslation {\n        body\n        translationLanguage\n        __typename\n      }\n      imageTranscriptionText(apiProvider: CHEGG_DS)\n      lastAnswerUuid\n      __typename\n    }\n    questionGeoLocation {\n      countryCode\n      countryName\n      languages\n      __typename\n    }\n    questionRoutingDetails {\n      answeringStartTime\n      bonusCount\n      bonusTimeAllocationEnabled\n      checkAnswerStructureEnabled\n      hasAnsweringStarted\n      questionAssignTime\n      questionSolvingProbability\n      routingType\n      allocationExperimentId\n      questionQualityFactor\n      __typename\n    }\n    __typename\n  }\n}"
     })
     SKIP_PAYLOAD = {
-        "operationName": None,
+        "operationName": "SkipQuestionAssignment",
         "variables": {
             "questionId": '',
-            "flag": "01",
-            "skipPage": "D",
-            "comment": "",
-            "isStructuredQnA": False
+            "skipPageFlow": "DECISION",
+            "skipPrimaryReason": {
+                "noKnowledge": True
+            }
         },
-        "query": "mutation ($questionId: Int!, $flag: String!, $skipPage: String!, $comment: String, $isStructuredQnA: Boolean) {\n  skipQuestion(questionId: $questionId, flag: $flag, skipPage: $skipPage, comments: $comment, isStructuredQnA: $isStructuredQnA)\n}\n"
-    }
-    TRANSCRIPT_PAYLOAD = {
-    "operationName": "getContentTranscription",
-    "variables": {
-        "contentUuid": "",
-        "contentType": "QUESTION",
-        "katex": True
-    },
-    "query": "query getContentTranscription($contentUuid: String!, $contentType: String!, $katex: Boolean) {\n  getContentTranscription(contentUuid: $contentUuid, contentType: $contentType, katex: $katex) {\n    contentUuid\n    contentType\n    text\n    __typename\n  }\n}\n"
+        "query": "mutation SkipQuestionAssignment($questionId: Long!, $skipPageFlow: QnaCurrentPageFlow!, $skipPrimaryReason: QuestionSkipPrimaryReasons, $newSkipReason: QuestionNewSkipReasons) {\n  skipQuestionAssignment(\n    questionId: $questionId\n    skipPageFlow: $skipPageFlow\n    skipPrimaryReason: $skipPrimaryReason\n    newSkipReason: $newSkipReason\n  ) {\n    message\n    questionId\n    __typename\n  }\n}"
     }
     TIMEOUT_FOR_REQUESTS = (10, 20)
 
@@ -64,7 +55,8 @@ class Chegg:
         self.parse_images = parse_images
         self.notify = TelegramBot()
         self.question_uuid = None
-        self.has_images = False
+        self.transcript = ""
+
     @staticmethod
     def get_headers(headers):
         '''
@@ -78,12 +70,6 @@ class Chegg:
         log(f'Creating skip payload for {self.question_id}')
         payload = Chegg.SKIP_PAYLOAD
         payload["variables"]["questionId"] = self.question_id
-        return json.dumps(payload)
-
-    def create_transcript_payload(self):
-        log(f'Creating transcript payload for {self.question_uuid}')
-        payload = Chegg.TRANSCRIPT_PAYLOAD
-        payload["variables"]["contentUuid"] = self.question_uuid
         return json.dumps(payload)
 
     def fetch_question(self):
@@ -101,28 +87,15 @@ class Chegg:
             exit()
         res_data = json.loads(response.text)
         log(f'HTTP Response {response.status_code}')
-        ques_obj = res_data['data']['getQuestion']
+        ques_obj = res_data['data']['nextQuestionAnsweringAssignment']['question']
         if ques_obj:
             self.question = ques_obj
             self.question_id = ques_obj['id']
             self.question_uuid = ques_obj['uuid']
             self.question_body = ques_obj['body']
-            self.has_images = ques_obj['hasImage']
+            if ques_obj['imageTranscriptionText'] is not None:
+                self.transcript = ques_obj['imageTranscriptionText']
         return ques_obj
-
-    def fetch_transcript(self):
-        '''
-            # Fetch the question images text i.e transcript
-            # Returns string
-            # else returns None
-            # or Raise Exception
-        '''
-        log(f'Fetching the transcript')
-        payload = self.create_transcript_payload()
-        response = requests.request(
-            "POST", Chegg.URL, headers=self.headers, data=payload, timeout=Chegg.TIMEOUT_FOR_REQUESTS)
-        res_data = json.loads(response.text)
-        return res_data['data']['getContentTranscription']['text']
 
     def skip_question(self):
         '''

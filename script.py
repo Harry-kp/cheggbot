@@ -32,13 +32,8 @@ try:
             log("No questions left.")
             random_long_wait()
             continue
-        if bot.has_images:
-            transcript = bot.fetch_transcript()
-            random_wait()
-        else:
-            transcript = ""
         analyze = Analyze(keywords=bot.keywords,
-                          question=bot.question, transcript=transcript, parse_images=bot.parse_images)
+                          question=bot.question, transcript=bot.transcript, parse_images=bot.parse_images)
         if analyze.is_ques_good():
             bot.answer_question()
             skip = input("Press enter to continue or press any other key to stop the script.")
