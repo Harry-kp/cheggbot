@@ -22,3 +22,5 @@ telegram:
     token: None
     chat_id: None
 
+# Default path is the current working directory in notify.mp3 file
+notification_sound_path: 'notify.mp3'

@@ -1,16 +1,21 @@
 import json
-
+import os
 import requests
+import yaml
 
 from notifications import TelegramBot
 from utils import log
 
+config = ''
+with open("config.yaml", "r") as yamlfile:
+    config = yaml.load(yamlfile, Loader=yaml.FullLoader)
 
 class Chegg:
     """
     A class that automates the process of answering ques on chegg and skip the question which are not good to answer.
     """
     URL = "https://gateway.chegg.com/nestor-graph/graphql"
+    DASHBOARD_URL = "https://expert.chegg.com/qna/authoring/answer"
     HEADERS = {
         'authority': 'gateway.chegg.com',
         'accept': '*/*',
@@ -107,7 +112,9 @@ class Chegg:
             "POST", Chegg.URL, headers=Chegg.HEADERS, data=payload, timeout=Chegg.TIMEOUT_FOR_REQUESTS)
 
     def answer_question(self):
-        log(f"Hurray!! You got a suitable question to answer ")
+        log(f"Hurray!! You got a suitable question to answer -> {Chegg.DASHBOARD_URL} ")
+        # Play the alert sound on terminal
+        os.system(f"afplay {config.get('notification_sound_path')}")
         message = "Hurray!! You got a suitable question to answer " + self.question_body
         self.notify.send_notificaion(
             repr(message))
