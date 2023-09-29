@@ -88,11 +88,11 @@ class Chegg:
         response = requests.request(
             "POST", Chegg.URL, headers=self.headers, data=Chegg.FETCH_PAYLOAD, timeout=Chegg.TIMEOUT_FOR_REQUESTS)
         if response.status_code == 401:
-            log("Unauthorised!! Cookie expired. PLease give a new cookie.")
+            log("Unauthorised!! Cookie expired. Please give a new cookie.")
             exit()
         res_data = json.loads(response.text)
         log(f'HTTP Response {response.status_code}')
-        ques_obj = res_data['data']['nextQuestionAnsweringAssignment']['question']
+        ques_obj = res_data['data']['nextQuestionAnsweringAssignment']['question'] if res_data['data'] is not None else None
         if ques_obj:
             self.question = ques_obj
             self.question_id = ques_obj['id']
