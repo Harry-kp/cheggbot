@@ -1,6 +1,7 @@
+
 <div align="center">
-  <img src="./images/icon.png" width="154" alt="Cheggbot Logo">
   <h1>Cheggbot</h1>
+  <img src="https://github.com/Harry-kp/cheggbot/assets/55315065/0d9746aa-f100-4eac-9ed7-b76bd46d01e6" width="500" alt="Cheggbot Logo">
   <p>Bored of skipping questions and "No more questions in queue" message and looking for an automation script? Congrats, you are in the right place.</p>
 </div>
 
