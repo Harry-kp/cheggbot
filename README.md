@@ -1,6 +1,11 @@
 
+
 <div align="center">
-  <h1>Cheggbot</h1>
+  <h1>Cheggbot [UNMAINTAINED]</h1>
+  
+  > [!WARNING]
+  > **This repository is no longer maintained.** The developer no longer has access to a Chegg account to verify or update this script. It is provided "as-is" for historical/educational purposes and may no longer function correctly. No new updates will be added.
+
   <img src="https://github.com/Harry-kp/cheggbot/assets/55315065/0d9746aa-f100-4eac-9ed7-b76bd46d01e6" width="500" alt="Cheggbot Logo">
   <p>Bored of skipping questions and "No more questions in queue" message and looking for an automation script? Congrats, you are in the right place.</p>
 </div>
